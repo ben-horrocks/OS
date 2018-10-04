@@ -26,6 +26,7 @@
 
 #include "os345.h"
 #include "os345signals.h"
+#include "queue.h"
 //#include "os345config.h"
 
 
@@ -36,6 +37,7 @@ extern int superMode;						// system mode
 extern Semaphore* semaphoreList;			// linked list of active semaphores
 extern Semaphore* taskSems[MAX_TASKS];		// task semaphore
 
+extern PriorityQueue rq;
 
 // **********************************************************************
 // **********************************************************************
@@ -104,6 +106,7 @@ int createTask(char* name,						// task name
 			tcb[tid].stack = malloc(STACK_SIZE * sizeof(int));
 
 			// ?? may require inserting task into "ready" queue
+			add_to_priority_queue(&rq, tid, priority);
 
 			if (tid) swapTask();				// do context switch (if not cli)
 			return tid;							// return tcb index (curTask)

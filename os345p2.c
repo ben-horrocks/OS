@@ -35,6 +35,8 @@ static Semaphore* s2Sem;					// task 2 semaphore
 extern TCB tcb[];								// task control block
 extern int curTask;							// current task #
 extern Semaphore* semaphoreList;			// linked list of active semaphores
+extern Semaphore* tics10sec;			// 1 second semaphore
+extern PriorityQueue rq;
 extern jmp_buf reset_context;				// context of kernel stack
 
 // ***********************************************************************
@@ -48,12 +50,22 @@ int ImAliveTask(int, char**);
 // project2 command
 int P2_project2(int argc, char* argv[])
 {
-	static char* s1Argv[] = {"signal1", "s1Sem"};
-	static char* s2Argv[] = {"signal2", "s2Sem"};
+	static char* s1Argv[] = {"signal1", "s1sem"};
+	static char* s2Argv[] = {"signal2", "s2sem"};
 	static char* aliveArgv[] = {"I'm Alive", "3"};
 
 	printf("\nStarting Project 2");
 	SWAP;
+
+	// Create 10 second timer tasks
+	for (int i = 0; i < 10; i++)
+	{
+		createTask("10 Second Timer",
+			currentTaskAndTime,
+			HIGH_PRIORITY,
+			argc,
+			argv);
+	}
 
 	// start tasks looking for sTask semaphores
 	createTask("signal1",				// task name
@@ -92,24 +104,40 @@ int P2_listTasks(int argc, char* argv[])
 	int i;
 
 //	?? 1) List all tasks in all queues
-// ?? 2) Show the task stake (new, running, blocked, ready)
-// ?? 3) If blocked, indicate which semaphore
-
+// ?? 2) Show the task state (new, running, blocked, ready)
+// ?? 3) If blocked, indicate which semaphore	
+	PriorityQueue queue = initialize_priority_queue();
 	for (i=0; i<MAX_TASKS; i++)
 	{
 		if (tcb[i].name)
 		{
-			printf("\n%4d/%-4d%20s%4d  ", i, tcb[i].parent,
-		  				tcb[i].name, tcb[i].priority);
-			if (tcb[i].signal & mySIGSTOP) my_printf("Paused");
-			else if (tcb[i].state == S_NEW) my_printf("New");
-			else if (tcb[i].state == S_READY) my_printf("Ready");
-			else if (tcb[i].state == S_RUNNING) my_printf("Running");
-			else if (tcb[i].state == S_BLOCKED) my_printf("Blocked    %s",
-		  				tcb[i].event->name);
-			else if (tcb[i].state == S_EXIT) my_printf("Exiting");
-			swapTask();
+			add_to_priority_queue(&queue, i, tcb[i].priority);
+			//printf("\n%4d/%-4d%20s%4d  ", i, tcb[i].parent,
+		 // 				tcb[i].name, tcb[i].priority);
+			//if (tcb[i].signal & mySIGSTOP) my_printf("Paused");
+			//else if (tcb[i].state == S_NEW) my_printf("New");
+			//else if (tcb[i].state == S_READY) my_printf("Ready");
+			//else if (tcb[i].state == S_RUNNING) my_printf("Running");
+			//else if (tcb[i].state == S_BLOCKED) my_printf("Blocked    %s",
+		 // 				tcb[i].event->name);
+			//else if (tcb[i].state == S_EXIT) my_printf("Exiting");
+			//swapTask();
 		}
+	}
+	printf("\n%4s%20s%9s  %s      %s", "ID", "Name", 
+		"Priority", "State", "Semaphore");
+	while ((i = serve_priority_queue(&queue, -1)) != -1)
+	{
+		printf("\n%4d%20s%9d  ", i,
+	  				tcb[i].name, tcb[i].priority);
+		if (tcb[i].signal & mySIGSTOP) my_printf("Paused");
+		else if (tcb[i].state == S_NEW) my_printf("New");
+		else if (tcb[i].state == S_READY) my_printf("Ready");
+		else if (tcb[i].state == S_RUNNING) my_printf("Running");
+		else if (tcb[i].state == S_BLOCKED) my_printf("Blocked    %s",
+	  				tcb[i].event->name);
+		else if (tcb[i].state == S_EXIT) my_printf("Exiting");
+		swapTask();
 	}
 	return 0;
 } // end P2_listTasks
@@ -230,9 +258,9 @@ int signalTask(int argc, char* argv[])
 	int count = 0;					// task variable
 
 	// create a semaphore
-	Semaphore** mySem = (!strcmp(argv[1], "s1Sem")) ? &s1Sem : &s2Sem;
+	Semaphore** mySem = (!strcmp(argv[1], "s1sem")) ? &s1Sem : &s2Sem;
 	*mySem = createSemaphore(argv[1], 0, 0);
-
+	printf("Semaphore created\n");
 	// loop waiting for semaphore to be signaled
 	while(count < COUNT_MAX)
 	{
@@ -273,3 +301,25 @@ char* myTime(char* svtime)
 	svtime[strlen(svtime)-1] = 0;		// eliminate nl at end
 	return svtime;
 } // end myTime
+
+
+// ***********************************************************************
+// ***********************************************************************
+// currentTaskAndTime
+//
+int currentTaskAndTime(int argc, char* argv[])
+{
+	int i;
+	char timestring[80];
+	struct tm *ts;
+	while (1)
+	{
+		SEM_WAIT(tics10sec);
+		time_t currentTime;
+		time(&currentTime);
+		ts = localtime(&currentTime);
+		strftime(timestring, sizeof(timestring), "%Y-%m-%d %H:%M:%S", ts);
+		printf("\nTask Number: %d\nCurrent Time:%s", curTask, timestring);
+	}
+	return 0;
+} // end currentTaskAndTime

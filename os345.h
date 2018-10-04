@@ -6,6 +6,7 @@
 #define __os345_h__
 #pragma warning(disable:4996)
 //#include<setjmp.h>
+#include "queue.h"
 // ***********************************************************************
 // ***********************************************************************
 // Context switching directives
@@ -78,6 +79,7 @@ typedef struct semaphore			// semaphore
 	int state;							// semaphore state
 	int type;							// semaphore type
 	int taskNum;						// semaphore creator task #
+	PriorityQueue bq;
 } Semaphore;
 
 // task control block
@@ -179,6 +181,7 @@ int P2_listTasks(int, char**);
 int P2_reset(int, char**);
 int P2_signal1(int, char**);
 int P2_signal2(int, char**);
+int currentTaskAndTime(int, char**);
 
 int P3_project3(int, char**);
 int P3_dc(int, char**);

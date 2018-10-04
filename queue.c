@@ -22,6 +22,7 @@ TID add_to_priority_queue(PriorityQueue* q, int id, int priority)
 
 	queue_item item = { id, priority };
 	q->items[q->size++] = item;
+	return id;
 }
 
 int serve_priority_queue(PriorityQueue* q, int id)

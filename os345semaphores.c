@@ -25,11 +25,11 @@
 #include <assert.h>
 
 #include "os345.h"
-
+#include "queue.h"
 
 extern TCB tcb[];							// task control block
 extern int curTask;							// current task #
-
+extern PriorityQueue rq;
 extern int superMode;						// system mode
 extern Semaphore* semaphoreList;			// linked list of active semaphores
 
@@ -63,6 +63,10 @@ temp:	// ?? temporary label
 				tcb[i].state = S_READY;	// unblock task
 
 				// ?? move task from blocked to ready queue
+				if (serve_priority_queue(&s->bq, i) == -1)
+					printf("SOMETHING WENT WRONG WITH THE PRIORITY QUEUE. CHECK SEMSIGNAL 1");
+				if (add_to_priority_queue(&rq, i, tcb[i].priority) == -1)
+					printf("SOMETHING WENT WRONG WITH THE PRIORITY QUEUE. CHECK SEMSIGNAL 2");
 
 				if (!superMode) swapTask();
 				return;
@@ -75,10 +79,25 @@ temp:	// ?? temporary label
 	}
 	else
 	{
+		
 		// counting semaphore
 		// ?? implement counting semaphore
 
-		goto temp;
+		int nextTask = serve_priority_queue(&s->bq, -1);
+		if (nextTask != -1)
+		{
+			tcb[nextTask].event = 0;			// clear event pointer
+			tcb[nextTask].state = S_READY;		// unblock task
+			if (add_to_priority_queue(&rq, nextTask, tcb[nextTask].priority) == -1)
+				printf("SOMETHING WENT WRONG WITH THE PRIORITY QUEUE. CHECK SEMSIGNAL 4");
+			return;
+		}
+		// nothing waiting on semaphore, go ahead and just signal
+		s->state++;						// nothing waiting, signal
+		if (!superMode) swapTask();
+		return;
+
+		//goto temp;
 	}
 } // end semSignal
 
@@ -110,7 +129,10 @@ temp:	// ?? temporary label
 			tcb[curTask].state = S_BLOCKED;
 
 			// ?? move task from ready queue to blocked queue
-
+			if (serve_priority_queue(&rq, curTask) == -1)
+				printf("SOMETHING WENT WRONG WITH THE PRIORITY QUEUE. CHECK SEMWAIT 1");
+			if ( add_to_priority_queue(&s->bq, curTask, tcb[curTask].priority) == -1)
+				printf("SOMETHING WENT WRONG WITH THE PRIORITY QUEUE. CHECK SEMWAIT 2");
 			swapTask();						// reschedule the tasks
 			return 1;
 		}
@@ -122,8 +144,22 @@ temp:	// ?? temporary label
 	{
 		// counting semaphore
 		// ?? implement counting semaphore
+		if (s->state == 0)
+		{
+			tcb[curTask].event = s;		// block task
+			tcb[curTask].state = S_BLOCKED;
 
-		goto temp;
+			// ?? move task from ready queue to blocked queue
+			if (serve_priority_queue(&rq, curTask) == -1)
+				printf("SOMETHING WENT WRONG WITH THE PRIORITY QUEUE. CHECK SEMWAIT 3");
+			if (add_to_priority_queue(&s->bq, curTask, tcb[curTask].priority) == -1)
+				printf("SOMETHING WENT WRONG WITH THE PRIORITY QUEUE. CHECK SEMWAIT 4");
+			swapTask();						// reschedule the tasks
+			return 1;
+		}
+		s->state--;
+		return 0;
+		//goto temp;
 	}
 } // end semWait
 
@@ -161,8 +197,13 @@ temp:	// ?? temporary label
 	{
 		// counting semaphore
 		// ?? implement counting semaphore
-
-		goto temp;
+		if (s->state == 0)
+		{
+			return 0;
+		}
+		s->state--;
+		return 1;
+		//goto temp;
 	}
 } // end semTryLock
 
@@ -212,6 +253,7 @@ Semaphore* createSemaphore(char* name, int type, int state)
 	sem->type = type;							// 0=binary, 1=counting
 	sem->state = state;						// initial semaphore state
 	sem->taskNum = curTask;					// set parent task #
+	sem->bq = initialize_priority_queue();
 
 	// prepend to semaphore list
 	sem->semLink = (struct semaphore*)semaphoreList;

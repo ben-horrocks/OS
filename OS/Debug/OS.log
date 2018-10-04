@@ -1,2 +1,3 @@
-﻿  os345.c
+﻿  os345p2.c
+d:\user folders\desktop\school\cs 345\os\os345p2.c(312): warning C4101: 'i': unreferenced local variable
   OS.vcxproj -> D:\User Folders\Desktop\School\CS 345\OS\Debug\OS.exe

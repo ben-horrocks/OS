@@ -57,6 +57,7 @@ Semaphore* inBufferReady;			// input buffer ready semaphore
 
 Semaphore* tics1sec;				// 1 second semaphore
 Semaphore* tics10thsec;				// 1/10 second semaphore
+Semaphore* tics10sec;
 
 // **********************************************************************
 // **********************************************************************
@@ -83,10 +84,10 @@ int lastPollClock;					// last pollClock
 bool diskMounted;					// disk has been mounted
 
 time_t oldTime1;					// old 1sec time
+time_t oldTime10;
 clock_t myClkTime;
 clock_t myOldClkTime;
 PriorityQueue rq;					// Ready priority queue
-PriorityQueue bq;					// Blocked priority queue
 //int* rq;							// ready priority queue
 
 
@@ -145,6 +146,7 @@ int main(int argc, char* argv[])
 	keyboard = createSemaphore("keyboard", BINARY, 1);
 	tics1sec = createSemaphore("tics1sec", BINARY, 0);
 	tics10thsec = createSemaphore("tics10thsec", BINARY, 0);
+	tics10sec = createSemaphore("tics10sec", COUNTING, 0);
 
 	//?? ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -204,12 +206,20 @@ static int scheduler()
 	// ?? priorities, clean up dead tasks, and handle semaphores appropriately.
 
 	// schedule next task
-	nextTask = ++curTask;
+	//nextTask = ++curTask;
 
-	// mask sure nextTask is valid
-	while (!tcb[nextTask].name)
+	//// mask sure nextTask is valid
+	//while (!tcb[nextTask].name)
+	//{
+	//	if (++nextTask >= MAX_TASKS) nextTask = 0;
+	//}
+	//if (tcb[nextTask].signal & mySIGSTOP)
+	//{
+	//	return -1;
+	//}
+	if ((nextTask = serve_priority_queue(&rq, -1)) >= 0)
 	{
-		if (++nextTask >= MAX_TASKS) nextTask = 0;
+		add_to_priority_queue(&rq, nextTask, tcb[nextTask].priority);
 	}
 	if (tcb[nextTask].signal & mySIGSTOP)
 	{
@@ -370,6 +380,7 @@ static int initOS()
 	// capture current time
 	lastPollClock = clock();			// last pollClock
 	time(&oldTime1);
+	time(&oldTime10);
 
 	// init system tcb's
 	for (i=0; i<MAX_TASKS; i++)
