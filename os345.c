@@ -31,6 +31,7 @@
 #include "os345lc3.h"
 #include "os345fat.h"
 #include "queue.h"
+#include "DeltaClock.h"
 
 // **********************************************************************
 //	local prototypes
@@ -58,7 +59,7 @@ Semaphore* inBufferReady;			// input buffer ready semaphore
 Semaphore* tics1sec;				// 1 second semaphore
 Semaphore* tics10thsec;				// 1/10 second semaphore
 Semaphore* tics10sec;
-
+Semaphore* dcChange;
 // **********************************************************************
 // **********************************************************************
 // global system variables
@@ -88,6 +89,7 @@ time_t oldTime10;
 clock_t myClkTime;
 clock_t myOldClkTime;
 PriorityQueue rq;					// Ready priority queue
+DeltaClock deltaClock;
 //int* rq;							// ready priority queue
 
 
@@ -108,10 +110,15 @@ int main(int argc, char* argv[])
 	//return 0;
 	//--------END QUEUE TESTING--------
 
+	//--------DELTA CLOCK TESTING--------
+	//testdeltaclock();
+	//return 0;
+	//--------END DELTA CLOCK TESTING--------
+
 	// save context for restart (a system reset would return here...)
 	int resetCode = setjmp(reset_context);
 	superMode = TRUE;						// supervisor mode
-
+	//printf("SEE Line 121\n");
 	switch (resetCode)
 	{
 		case POWER_DOWN_QUIT:				// quit
@@ -147,7 +154,7 @@ int main(int argc, char* argv[])
 	tics1sec = createSemaphore("tics1sec", BINARY, 0);
 	tics10thsec = createSemaphore("tics10thsec", BINARY, 0);
 	tics10sec = createSemaphore("tics10sec", COUNTING, 0);
-
+	dcChange = createSemaphore("dcChange", BINARY, 0);
 	//?? ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 	// schedule CLI task
@@ -219,7 +226,8 @@ static int scheduler()
 	//}
 	if ((nextTask = serve_priority_queue(&rq, -1)) >= 0)
 	{
-		add_to_priority_queue(&rq, nextTask, tcb[nextTask].priority);
+		if (tcb[nextTask].state != S_EXIT)
+			add_to_priority_queue(&rq, nextTask, tcb[nextTask].priority);
 	}
 	if (tcb[nextTask].signal & mySIGSTOP)
 	{
@@ -228,7 +236,6 @@ static int scheduler()
 
 	return nextTask;
 } // end scheduler
-
 
 
 // **********************************************************************
@@ -242,7 +249,6 @@ static int dispatcher()
 	// schedule task
 	switch(tcb[curTask].state)
 	{
-		printf("Getting here\n");
 		case S_NEW:
 		{
 			// new task
@@ -253,6 +259,7 @@ static int dispatcher()
 			if (setjmp(k_context))
 			{
 				superMode = TRUE;					// supervisor mode
+				//printf("SEE Line 262\n");
 				break;								// context switch to next task
 			}
 
@@ -376,7 +383,9 @@ static int initOS()
 	//rq = (int*)malloc(MAX_TASKS * sizeof(int));
 	rq = initialize_priority_queue();
 	if (rq.size != 0) return 99;
-	
+
+	deltaClock = initialize_delta_clock();
+	if (deltaClock.size != 0) return 99;
 	// capture current time
 	lastPollClock = clock();			// last pollClock
 	time(&oldTime1);
@@ -433,4 +442,3 @@ void powerDown(int code)
 	RESTORE_OS
 	return;
 } // end powerDown
-

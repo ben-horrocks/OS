@@ -45,6 +45,7 @@ void semSignal(Semaphore* s)
 {
 	int i;
 	// assert there is a semaphore and it is a legal type
+	
 	assert("semSignal Error" && s && ((s->type == 0) || (s->type == 1)));
 
 	// check semaphore type
@@ -112,6 +113,7 @@ temp:	// ?? temporary label
 //
 int semWait(Semaphore* s)
 {
+	//printf("SuperMode? %d\n", superMode);
 	assert("semWait Error" && s);												// assert semaphore
 	assert("semWait Error" && ((s->type == 0) || (s->type == 1)));	// assert legal type
 	assert("semWait Error" && !superMode);								// assert user mode

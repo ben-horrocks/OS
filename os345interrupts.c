@@ -27,6 +27,7 @@
 #include "os345.h"
 #include "os345config.h"
 #include "os345signals.h"
+#include "DeltaClock.h"
 
 // **********************************************************************
 //	local prototypes
@@ -56,7 +57,7 @@ extern time_t oldTime1;					// old 1sec time
 extern time_t oldTime10;				// old 10sec time
 extern clock_t myClkTime;
 extern clock_t myOldClkTime;
-
+extern DeltaClock deltaClock;
 extern int pollClock;				// current clock()
 extern int lastPollClock;			// last pollClock
 
@@ -73,7 +74,7 @@ void pollInterrupts(void)
 {
 	// check for task monopoly
 	pollClock = clock();
-	assert("Timeout" && ((pollClock - lastPollClock) < MAX_CYCLES));
+	//assert("Timeout" && ((pollClock - lastPollClock) < MAX_CYCLES));
 	lastPollClock = pollClock;
 
 	// check for keyboard interrupt
@@ -218,6 +219,7 @@ static void timer_isr()
 	{
 		myOldClkTime = myOldClkTime + ONE_TENTH_SEC;   // update old
 		semSignal(tics10thsec);
+		decrement_delta_clock(&deltaClock);
 	}
 
 	// ?? add other timer sampling/signaling code here for project 2

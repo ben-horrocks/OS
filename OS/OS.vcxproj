@@ -115,6 +115,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\DeltaClock.c" />
+    <ClCompile Include="..\jparktasks.c" />
     <ClCompile Include="..\os345.c" />
     <ClCompile Include="..\os345fat.c" />
     <ClCompile Include="..\os345interrupts.c" />
@@ -133,6 +135,8 @@
     <ClCompile Include="..\queue.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\DeltaClock.h" />
+    <ClInclude Include="..\jparkTasks.h" />
     <ClInclude Include="..\os345.h" />
     <ClInclude Include="..\os345config.h" />
     <ClInclude Include="..\os345fat.h" />

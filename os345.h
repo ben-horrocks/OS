@@ -5,7 +5,7 @@
 #ifndef __os345_h__
 #define __os345_h__
 #pragma warning(disable:4996)
-//#include<setjmp.h>
+#include<setjmp.h>
 #include "queue.h"
 // ***********************************************************************
 // ***********************************************************************
@@ -19,9 +19,9 @@
 
 // ***********************************************************************
 // Semaphore directives
-#define SEM_WAIT(s)			semWait(s);
-#define SEM_SIGNAL(s)		semSignal(s);
-#define SEM_TRYLOCK(s)		semTryLock(s);
+#define SEM_WAIT(s)			semWait(s)
+#define SEM_SIGNAL(s)		semSignal(s)
+#define SEM_TRYLOCK(s)		semTryLock(s)
 
 // ***********************************************************************
 // Miscellaneous directives
@@ -158,7 +158,7 @@ int semTryLock(Semaphore*);
 // ***********************************************************************
 // Command prototypes
 
-#define NUM_COMMANDS 51
+#define NUM_COMMANDS 52
 typedef struct								// command struct
 {
 	char* command;
@@ -185,6 +185,8 @@ int currentTaskAndTime(int, char**);
 
 int P3_project3(int, char**);
 int P3_dc(int, char**);
+int P3_tdc(int, char**);
+int deltaClockDecrement(int, char**);
 
 int P4_project4(int, char**);
 int P4_dumpFrame(int, char**);

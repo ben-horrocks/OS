@@ -1,3 +1,4 @@
-﻿  os345p2.c
-d:\user folders\desktop\school\cs 345\os\os345p2.c(312): warning C4101: 'i': unreferenced local variable
-  OS.vcxproj -> D:\User Folders\Desktop\School\CS 345\OS\Debug\OS.exe
+﻿  jparktasks.c
+d:\user folders\desktop\school\cs345\os\jparktasks.c(37): warning C4013: 'atoi' undefined; assuming extern returning int
+d:\user folders\desktop\school\cs345\os\jparktasks.c(129): warning C4013: 'rand' undefined; assuming extern returning int
+  OS.vcxproj -> D:\User Folders\Desktop\School\cs345\OS\Debug\OS.exe

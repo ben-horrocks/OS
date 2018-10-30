@@ -173,6 +173,9 @@ int sysKillTask(int taskId)
 	Semaphore* sem = semaphoreList;
 	Semaphore** semLink = &semaphoreList;
 
+	//printf("Trying to kill id %d\n", taskId);
+	//printf("Trying to kill %s\n", tcb[taskId].name);
+	//printf("In SuperMode?: %d\n", superMode);
 	// assert that you are not pulling the rug out from under yourself!
 	assert("sysKillTask Error" && tcb[taskId].name && superMode);
 	printf("\nKill Task %s", tcb[taskId].name);
