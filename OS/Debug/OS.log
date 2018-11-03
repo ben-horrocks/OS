@@ -1,4 +1,42 @@
-﻿  jparktasks.c
+﻿  DeltaClock.c
+d:\user folders\desktop\school\cs345\os\deltaclock.c(17): warning C4013: 'printf' undefined; assuming extern returning int
+  jparktasks.c
 d:\user folders\desktop\school\cs345\os\jparktasks.c(37): warning C4013: 'atoi' undefined; assuming extern returning int
 d:\user folders\desktop\school\cs345\os\jparktasks.c(129): warning C4013: 'rand' undefined; assuming extern returning int
+  os345.c
+  os345fat.c
+  os345interrupts.c
+  os345lc3.c
+  os345mmu.c
+d:\user folders\desktop\school\cs345\os\os345mmu.c(82): warning C4101: 'rpte2': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345mmu.c(81): warning C4101: 'pa': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345mmu.c(83): warning C4101: 'upte2': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345mmu.c(83): warning C4101: 'upte1': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345mmu.c(83): warning C4101: 'upta': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345mmu.c(82): warning C4101: 'rpte1': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345mmu.c(84): warning C4101: 'rptFrame': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345mmu.c(84): warning C4101: 'uptFrame': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345mmu.c(82): warning C4101: 'rpta': unreferenced local variable
+  os345p1.c
+  os345p2.c
+d:\user folders\desktop\school\cs345\os\os345p2.c(312): warning C4101: 'i': unreferenced local variable
+  os345p3.c
+d:\user folders\desktop\school\cs345\os\os345p3.c(76): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+  os345p4.c
+d:\user folders\desktop\school\cs345\os\os345p4.c(321): warning C4101: 'upte2': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345p4.c(321): warning C4101: 'upte1': unreferenced local variable
+  os345p5.c
+  os345p6.c
+d:\user folders\desktop\school\cs345\os\os345p6.c(664): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+d:\user folders\desktop\school\cs345\os\os345p6.c(1355): warning C4101: 'error': unreferenced local variable
+d:\user folders\desktop\school\cs345\os\os345p6.c(1458): warning C4101: 'fileID': unreferenced local variable
+  os345park.c
+  os345semaphores.c
+d:\user folders\desktop\school\cs345\os\os345semaphores.c(57): warning C4102: 'temp': unreferenced label
+d:\user folders\desktop\school\cs345\os\os345semaphores.c(127): warning C4102: 'temp': unreferenced label
+d:\user folders\desktop\school\cs345\os\os345semaphores.c(189): warning C4102: 'temp': unreferenced label
+  os345signals.c
+  os345tasks.c
+  Generating Code...
+  LINK : D:\User Folders\Desktop\School\cs345\OS\Debug\OS.exe not found or not built by the last incremental link; performing full link
   OS.vcxproj -> D:\User Folders\Desktop\School\cs345\OS\Debug\OS.exe
